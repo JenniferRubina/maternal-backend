@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-
+// Verify number and return full mother details if exists
 router.post('/verify-number', async (req, res) => {
   const { phone } = req.body;
   try {
@@ -21,12 +21,15 @@ router.post('/verify-number', async (req, res) => {
       'SELECT * FROM public.motherdetails WHERE contact_number = $1',
       [phone]
     );
+
     if (result.rows.length > 0) {
-      res.status(200).json({ exists: true });
+      // return the full mother details instead of just exists: true
+      res.status(200).json(result.rows[0]);
     } else {
-      res.status(404).json({ exists: false });
+      res.status(404).json({ message: "Mother not found" });
     }
   } catch (err) {
+    console.error("Error in verify-number:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
