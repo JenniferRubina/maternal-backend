@@ -18,7 +18,7 @@ router.post('/verify-number', async (req, res) => {
   const { phone } = req.body;
   try {
     const result = await pool.query(
-      'SELECT * FROM mother_details WHERE phone = $1',
+      'SELECT rch_id FROM public.motherdetails where contact_number= $1',
       [phone]
     );
     if (result.rows.length > 0) {
