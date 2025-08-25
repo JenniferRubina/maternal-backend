@@ -24,7 +24,7 @@ router.post('/verify-number', async (req, res) => {
 
     if (result.rows.length > 0) {
       // return the full mother details instead of just exists: true
-      res.status(200).json(result.rows[0]);
+      res.status(200).json(result);
     } else {
       res.status(404).json({ message: "Mother not found" });
     }
