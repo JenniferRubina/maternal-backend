@@ -33,4 +33,73 @@ router.post('/verify-number', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+router.get('/diet/:rch_id', async (req, res) => {
+  const { rch_id } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT meal_timing, food_items FROM diet WHERE rch_id = $1',
+      [rch_id]
+    );
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+    } else {
+      res.status(404).json({ message: "No diet records found" });
+    }
+  } catch (err) {
+    console.error("Error in /diet:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// Get appointment details by RCH ID
+router.get('/appointment/:rch_id', async (req, res) => {
+  const { rch_id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT 
+        a.visit_type, 
+        a.appointment_datetime, 
+        h.name AS doctor_name
+      FROM appointment a
+      JOIN healthcare_worker h 
+        ON a.doctor = h.id
+      WHERE a.rch_id = $1`,
+      [rch_id]
+    );
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+    } else {
+      res.status(404).json({ message: "No appointments found" });
+    }
+  } catch (err) {
+    console.error("Error in /appointment:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// Get mother details (ANC visit) by RCH ID
+router.get('/mother-details/:rch_id', async (req, res) => {
+  const { rch_id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT hb, bp_systolic, bp_diastolic 
+       FROM public.anc_visit
+       WHERE rch_id = $1`,
+      [rch_id]
+    );
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+    } else {
+      res.status(404).json({ message: "No ANC visit details found" });
+    }
+  } catch (err) {
+    console.error("Error in /mother-details:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 module.exports = router;
