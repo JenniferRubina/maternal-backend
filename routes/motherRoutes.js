@@ -70,7 +70,7 @@ router.get('/appointment/:rch_id', async (req, res) => {
     );
 
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows);
+      res.status(200).json(result.rows[0]);
     } else {
       res.status(404).json({ message: "No appointments found" });
     }
@@ -93,7 +93,7 @@ router.get('/mother-details/:rch_id', async (req, res) => {
     );
 
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows);
+      res.status(200).json(result.rows[0]);
     } else {
       res.status(404).json({ message: "No ANC visit details found" });
     }
