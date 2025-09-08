@@ -95,7 +95,7 @@ router.post('/appointment', async (req, res) => {
   const { rch_id } = req.body;
   try {
     const result = await pool.query(
-      `SELECT a.visit_type, a.appointment_datetime, h.name AS doctor_name FROM appointment a JOIN healthcare_worker h ON a.doctor = h.id WHERE a.rch_id = 4` //, [rch_id]  
+      `SELECT a.visit_type, a.appointment_datetime, h.name AS doctor_name FROM appointment a JOIN healthcare_worker h ON a.doctor = h.id WHERE a.rch_id = 4` , [rch_id]  
     );
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
