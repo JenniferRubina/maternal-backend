@@ -30,8 +30,7 @@ router.post('/diet', async (req, res) => {
   const { rch_id } = req.body;
   try {
     const result = await pool.query(
-      'SELECT meal_timing, food_items FROM diet WHERE rch_id = $1',
-      [rch_id]
+      'SELECT meal_timing, food_items FROM diet'
     );
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
