@@ -115,14 +115,11 @@ router.post('/mother-details', async (req, res) => {
   const { rch_id } = req.params;
   try {
     const result = await pool.query(
-      `SELECT hb, bp_systolic, bp_diastolic 
-       FROM public.anc_visit
-       WHERE rch_id = $1`,
-      [rch_id]
+      `SELECT hb, bp_systolic, bp_diastolic FROM public.anc_visit WHERE rch_id = $1`, [rch_id]
     );
 
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows[0]);
+      res.status(200).json(result.rows);
     } else {
       res.status(404).json({ message: "No ANC visit details found" });
     }
