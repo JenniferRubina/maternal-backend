@@ -91,6 +91,23 @@ router.post('/appointment', async (req, res) => {
   }
 });
 
+router.post('/appointment', async (req, res) => {
+  const { rch_id } = req.body;
+  try {
+    const result = await pool.query(
+      `SELECT a.visit_type, a.appointment_datetime, h.name AS doctor_name FROM appointment a JOIN healthcare_worker h ON a.doctor = h.id WHERE a.rch_id = $1`, [rch_id]  
+    );
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+    } else {
+      res.status(404).json({ message: "No diet records found" });
+    }
+  } catch (err) {
+    console.error("Error in /diet:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 
 // Get mother details (ANC visit) by RCH ID
