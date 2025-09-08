@@ -65,31 +65,31 @@ router.post('/diet', async (req, res) => {
 
 
 // Get appointment details by RCH ID
-router.post('/appointment', async (req, res) => {
-  const { rch_id } = req.body; // ✅ Read from request body
-  try {
-    const result = await pool.query(
-      `SELECT 
-        a.visit_type, 
-        a.appointment_datetime, 
-        h.name AS doctor_name
-      FROM appointment a
-      JOIN healthcare_worker h 
-        ON a.doctor = h.id
-      WHERE a.rch_id = $1`, // ✅ Use a parameterized query
-      [rch_id]               // ✅ Pass the value here
-    );
+// router.post('/appointment', async (req, res) => {
+//   const { rch_id } = req.body; // ✅ Read from request body
+//   try {
+//     const result = await pool.query(
+//       `SELECT 
+//         a.visit_type, 
+//         a.appointment_datetime, 
+//         h.name AS doctor_name
+//       FROM appointment a
+//       JOIN healthcare_worker h 
+//         ON a.doctor = h.id
+//       WHERE a.rch_id = $1`, // ✅ Use a parameterized query
+//       [rch_id]               // ✅ Pass the value here
+//     );
 
-    if (result.rows.length > 0) {
-      res.status(200).json(result.rows); // ✅ Return all rows
-    } else {
-      res.status(404).json({ message: "No appointments found" });
-    }
-  } catch (err) {
-    console.error("Error in /appointment:", err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
+//     if (result.rows.length > 0) {
+//       res.status(200).json(result.rows); // ✅ Return all rows
+//     } else {
+//       res.status(404).json({ message: "No appointments found" });
+//     }
+//   } catch (err) {
+//     console.error("Error in /appointment:", err.message);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 router.post('/appointment', async (req, res) => {
   const { rch_id } = req.body;
