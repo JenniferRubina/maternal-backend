@@ -25,24 +25,44 @@ router.post('/verify-number', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-router.post('/diet/:rch_id', async (req, res) => {
-  const { rch_id } = req.params;
+
+router.post('/diet', async (req, res) => {
+  const { rch_id } = req.body;
   try {
     const result = await pool.query(
       'SELECT meal_timing, food_items FROM diet WHERE rch_id = $1',
       [rch_id]
     );
-
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
     } else {
       res.status(404).json({ message: "No diet records found" });
     }
   } catch (err) {
-    console.error("Error in /diet:", err);
+    console.error("Error in /diet:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
+
+
+// router.post('/diet/:rch_id', async (req, res) => {
+//   const { rch_id } = req.params;
+//   try {
+//     const result = await pool.query(
+//       'SELECT meal_timing, food_items FROM diet WHERE rch_id = $1',
+//       [rch_id]
+//     );
+
+//     if (result.rows.length > 0) {
+//       res.status(200).json(result.rows);
+//     } else {
+//       res.status(404).json({ message: "No diet records found" });
+//     }
+//   } catch (err) {
+//     console.error("Error in /diet:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 
 // Get appointment details by RCH ID
