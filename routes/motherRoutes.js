@@ -33,7 +33,7 @@ router.post('/verify-number', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-router.get('/diet/:rch_id', async (req, res) => {
+router.post('/diet/:rch_id', async (req, res) => {
   const { rch_id } = req.params;
   try {
     const result = await pool.query(
@@ -54,7 +54,7 @@ router.get('/diet/:rch_id', async (req, res) => {
 
 
 // Get appointment details by RCH ID
-router.get('/appointment/:rch_id', async (req, res) => {
+router.post('/appointment/:rch_id', async (req, res) => {
   const { rch_id } = req.params;
   try {
     const result = await pool.query(
@@ -82,7 +82,7 @@ router.get('/appointment/:rch_id', async (req, res) => {
 
 
 // Get mother details (ANC visit) by RCH ID
-router.get('/mother-details/:rch_id', async (req, res) => {
+router.post('/mother-details/:rch_id', async (req, res) => {
   const { rch_id } = req.params;
   try {
     const result = await pool.query(
