@@ -76,8 +76,8 @@ router.post('/appointment', async (req, res) => {
       FROM appointment a
       JOIN healthcare_worker h 
         ON a.doctor = h.id
-      WHERE a.rch_id = $1`,
-      [rch_id]
+      WHERE a.rch_id = 4`
+  
     );
 
     if (result.rows.length > 0) {
