@@ -65,7 +65,7 @@ router.post('/diet', async (req, res) => {
 
 
 // Get appointment details by RCH ID
-router.post('/appointment/:rch_id', async (req, res) => {
+router.post('/appointment', async (req, res) => {
   const { rch_id } = req.params;
   try {
     const result = await pool.query(
@@ -93,7 +93,7 @@ router.post('/appointment/:rch_id', async (req, res) => {
 
 
 // Get mother details (ANC visit) by RCH ID
-router.post('/mother-details/:rch_id', async (req, res) => {
+router.post('/mother-details', async (req, res) => {
   const { rch_id } = req.params;
   try {
     const result = await pool.query(
