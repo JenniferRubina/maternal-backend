@@ -39,7 +39,7 @@ router.post('/diet/:rch_id', async (req, res) => {
       res.status(404).json({ message: "No diet records found" });
     }
   } catch (err) {
-    console.error("Error in /diet:", err.message);
+    console.error("Error in /diet:", err);
     res.status(500).json({ error: err.message });
   }
 });
