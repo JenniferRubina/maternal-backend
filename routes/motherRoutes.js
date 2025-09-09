@@ -111,21 +111,39 @@ router.post('/appointment', async (req, res) => {
 
 
 // Get mother details (ANC visit) by RCH ID
+// router.post('/mother-details', async (req, res) => {
+//   const { rch_id } = req.params;
+//   try {
+//     const result = await pool.query(
+//       `SELECT hb, bp_systolic, bp_diastolic FROM public.anc_visit WHERE rch_id = $1`, [rch_id]
+//     );
+
+//     if (result.rows.length > 0) {
+//       res.status(200).json(result.rows);
+//     } else {
+//       res.status(404).json({ message: "No ANC visit details found" });
+//     }
+//   } catch (err) {
+//     console.error("Error in /mother-details:", err.message);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
 router.post('/mother-details', async (req, res) => {
-  const { rch_id } = req.params;
+  const { rch_id } = req.body;
   try {
     const result = await pool.query(
-      `SELECT hb, bp_systolic, bp_diastolic FROM public.anc_visit WHERE rch_id = $1`, [rch_id]
+      `SELECT hb, bp_systolic, bp_diastolic FROM public.anc_visit WHERE rch_id = $1`, [rch_id]  
     );
-
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
     } else {
-      res.status(404).json({ message: "No ANC visit details found" });
+      res.status(404).json({ message: "No diet records found" });
     }
   } catch (err) {
-    console.error("Error in /mother-details:", err.message);
+    console.error("Error in /diet:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
+
 module.exports = router;
