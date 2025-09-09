@@ -136,7 +136,7 @@ router.post('/mother-details', async (req, res) => {
       `SELECT hb, bp_systolic, bp_diastolic FROM public.anc_visit WHERE rch_id = $1`, [rch_id]  
     );
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows);
+      res.status(200).json(result.rows[0]);
     } else {
       res.status(404).json({ message: "No diet records found" });
     }
