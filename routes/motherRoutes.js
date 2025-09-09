@@ -136,12 +136,34 @@ router.post('/mother-details', async (req, res) => {
       `SELECT hb, bp_systolic, bp_diastolic FROM public.anc_visit WHERE rch_id = $1`, [rch_id]  
     );
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows[0]);
+      res.status(200).json(result.rows);
     } else {
       res.status(404).json({ message: "No diet records found" });
     }
   } catch (err) {
     console.error("Error in /diet:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/mother-details', async (req, res) => {
+  const rch_id = req.query.rch_id;  // Get rch_id from query parameters
+
+  if (!rch_id) {
+    return res.status(400).json({ message: "rch_id is required" });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT hb, bp_systolic, bp_diastolic FROM public.anc_visit WHERE rch_id = $1`, [rch_id]
+    );
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+    } else {
+      res.status(404).json({ message: "No mother details found" });
+    }
+  } catch (err) {
+    console.error("Error in /mother-details GET:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
