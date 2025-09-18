@@ -146,6 +146,95 @@ router.post('/mother-details', async (req, res) => {
   }
 });
 
+router.post('/available-slots', async (req, res) => {
+  const { rch_id } = req.body;
+  try {
+    const result = await pool.query(
+      `WITH target_doctor AS (
+    
+    SELECT da.doctor
+    FROM doctor_assignment da
+    WHERE da.rch_id = $1  
+),
+missed_dates AS (
+    SELECT DISTINCT a.appointment_datetime::date AS missed_date
+    FROM appointment a
+    JOIN target_doctor td ON a.doctor = td.doctor
+    WHERE a.status = 'missed'
+    ORDER BY missed_date ASC
+    LIMIT 5
+),
+doctor_duty AS (
+    SELECT 
+        COALESCE(hw.duty_start_time, '09:00')::time AS start_time,
+        COALESCE(hw.duty_end_time, '17:00')::time AS end_time
+    FROM healthcare_worker hw
+    JOIN target_doctor td ON hw.id = td.doctor
+),
+day_slots AS (
+    SELECT 
+        md.missed_date + g AS slot_date,
+        (dd.start_time + (n * interval '30 minutes'))::time AS slot_time,
+        CASE 
+            WHEN (dd.start_time + (n * interval '30 minutes'))::time < '12:30'::time THEN 'forenoon'
+            ELSE 'afternoon'
+        END AS session
+    FROM missed_dates md
+    CROSS JOIN generate_series(1, 5) g  -- 5-day window from missed_date
+    CROSS JOIN doctor_duty dd
+    CROSS JOIN generate_series(
+        0,
+        ((EXTRACT(EPOCH FROM (dd.end_time - dd.start_time)) / 60) / 30)::int - 1
+    ) n
+),
+taken_slots AS (
+    SELECT 
+        a.appointment_datetime::date AS appt_date,
+        a.appointment_datetime::time AS appt_time
+    FROM appointment a
+    JOIN target_doctor td ON a.doctor = td.doctor
+),
+leave_days AS (
+    SELECT dl.leave_date
+    FROM doctor_leave dl
+    JOIN target_doctor td ON dl.doctor = td.doctor
+),
+session_summary AS (
+    SELECT 
+        ds.slot_date,
+        ds.session,
+        ARRAY_AGG(ds.slot_time ORDER BY ds.slot_time) 
+            FILTER (WHERE ts.appt_time IS NULL) AS free_slot_times,
+        COUNT(*) FILTER (WHERE ts.appt_time IS NULL) AS free_slots,
+        CASE 
+            WHEN ds.slot_date IN (SELECT leave_date FROM leave_days) THEN 'leave'
+            WHEN COUNT(*) FILTER (WHERE ts.appt_time IS NULL) > 0 THEN 'available'
+            ELSE 'overflow'
+        END AS session_status
+    FROM day_slots ds
+    LEFT JOIN taken_slots ts 
+        ON ds.slot_date = ts.appt_date 
+       AND ds.slot_time = ts.appt_time
+    GROUP BY ds.slot_date, ds.session
+)
+SELECT *
+FROM session_summary
+WHERE session_status != 'leave'
+ORDER BY slot_date, session;`, [rch_id]  
+    );
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+    } else {
+      res.status(404).json({ message: "No diet records found" });
+    }
+  } catch (err) {
+    console.error("Error in /diet:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 router.get('/mother-details', async (req, res) => {
   const rch_id = req.query.rch_id;  // Get rch_id from query parameters
 
