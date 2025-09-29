@@ -108,6 +108,36 @@ router.post('/appointment', async (req, res) => {
   }
 });
 
+router.post('/reschedule-appointment', async (req, res) => {
+  const { appointment_id, new_date, new_time, new_session } = req.body;
+
+  try {
+    await pool.query(
+      `UPDATE appointment
+       SET 
+         appointment_datetime = make_timestamp(
+            EXTRACT(YEAR FROM $1::date)::int,
+            EXTRACT(MONTH FROM $1::date)::int,
+            EXTRACT(DAY FROM $1::date)::int,
+            EXTRACT(HOUR FROM $2::time)::int,
+            EXTRACT(MINUTE FROM $2::time)::int,
+            0
+         )::timestamp,
+         session = $3::text,
+         status = 'rescheduled',
+         reason = 'Rescheduled by user'
+       WHERE appointment.id = $4`,
+      [new_date, new_time, new_session, appointment_id]
+    );
+
+    res.status(200).json({ message: "Appointment rescheduled successfully" });
+  } catch (err) {
+    console.error("Error in /reschedule-appointment:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 
 // Get mother details (ANC visit) by RCH ID
@@ -263,5 +293,7 @@ router.get('/mother-details', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 module.exports = router;
