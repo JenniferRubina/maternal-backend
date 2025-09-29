@@ -108,25 +108,32 @@ router.post('/appointment', async (req, res) => {
   }
 });
 
+
 router.post('/reschedule-appointment', async (req, res) => {
   const { appointment_id, new_date, new_time, new_session } = req.body;
 
   try {
     await pool.query(
       `UPDATE appointment
-       SET 
-         appointment_datetime = make_timestamp(
-            EXTRACT(YEAR FROM $1::date)::int,
-            EXTRACT(MONTH FROM $1::date)::int,
-            EXTRACT(DAY FROM $1::date)::int,
-            EXTRACT(HOUR FROM $2::time)::int,
-            EXTRACT(MINUTE FROM $2::time)::int,
-            0
-         )::timestamp,
-         session = $3::text,
-         status = 'rescheduled',
-         reason = 'Rescheduled by user'
-       WHERE appointment.id = $4`,
+SET 
+    appointment_datetime = make_timestamp(
+        EXTRACT(YEAR FROM new_date)::int,
+        EXTRACT(MONTH FROM new_date)::int,
+        EXTRACT(DAY FROM new_date)::int,
+        EXTRACT(HOUR FROM new_time)::int,
+        EXTRACT(MINUTE FROM new_time)::int,
+        0
+    )::timestamp,
+    session = new_session,
+    status = 'rescheduled',
+    reason = 'Rescheduled by user'
+FROM (
+    SELECT 
+        $1::date AS new_date,
+        $2::time AS new_time,
+        $3::text AS new_session
+) params
+WHERE appointment.id = $4;`,
       [new_date, new_time, new_session, appointment_id]
     );
 
