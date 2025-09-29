@@ -222,11 +222,18 @@ FROM session_summary
 WHERE session_status != 'leave'
 ORDER BY slot_date, session;`, [rch_id]  
     );
-    if (result.rows.length > 0) {
-      res.status(200).json(result.rows);
-    } else {
-      res.status(404).json({ message: "No diet records found" });
-    }
+   if (result.rows.length > 0) {
+  const formatted = result.rows.map(r => ({
+    slotDate: r.slot_date,
+    session: r.session,
+    freeSlotTimes: r.free_slot_times || [], // will still be a string if not casted
+    freeSlots: Number(r.free_slots),
+    sessionStatus: r.session_status
+  }));
+  res.status(200).json(formatted);
+} else {
+  res.status(404).json({ message: "No slots found" });
+}
   } catch (err) {
     console.error("Error in /diet:", err.message);
     res.status(500).json({ error: err.message });
